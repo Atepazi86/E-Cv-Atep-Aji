@@ -161,3 +161,14 @@ input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid 
 #al{color:var(--a2)}
 :focus-visible{outline:2px solid var(--a2);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.rv{opacity:1;transform:none}}
+
+.pc{cursor:pointer}
+.pc .pb .btns{margin-top:auto}
+.pmb{max-width:640px;max-height:92vh;overflow:auto;display:grid;gap:10px;align-content:start}
+.pmb .cv{height:clamp(180px,38vh,300px);margin:0;font-size:64px}
+.pmb .cv img{object-fit:contain;background:rgba(0,0,0,.25)}
+.pmb .tag{justify-self:start}
+.pmb h3{font-size:22px}
+.pmb #pd{color:var(--mut);white-space:pre-line;line-height:1.7}
+.pmb #px{justify-self:start}
+.pmb .btns{margin-top:2px}

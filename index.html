@@ -133,6 +133,8 @@
 
 <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mb"><div class="cv" id="mcv"></div><h3 id="mt"></h3><p id="mi" style="color:var(--mut);margin:6px 0 14px"></p><button class="btn" id="mx">Tutup</button></div></div>
 
+<div class="modal" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pt"><div class="mb pmb"><div class="cv" id="pcv"></div><span class="tag" id="pcat"></span><h3 id="pt"></h3><p id="pd"></p><div class="chips" id="ps"></div><div class="btns" id="pbtn"></div><button class="btn" id="px" style="margin-top:6px">Tutup</button></div></div>
+
 <footer class="footer">
 <div class="wrap footer-inner">
 <div class="footer-brand"><h3 id="fName"></h3><p id="fDesc"></p></div>
@@ -191,10 +193,21 @@ function tl(list){return list.map(function(x){return '<div class="item"><time>'+
 
 var D=null,cur="Semua";
 function showP(){
-  var L=D.projects.filter(function(p){return cur==="Semua"||p.c===cur});
-  $("#pg").innerHTML=L.length?L.map(function(p,i){
+  var L=[];D.projects.forEach(function(p,i){if(cur==="Semua"||p.c===cur)L.push([p,i])});
+  $("#pg").innerHTML=L.length?L.map(function(x,n){var p=x[0];
     var btn=(p.demo||p.gh||p.c==="Web")?'<div class="btns">'+lnk(p.demo,"Live Demo")+lnk(p.gh,"GitHub")+'</div>':'';
-    return '<article class="pc"><div class="cv" style="'+grad(i)+'">'+cvi(p,true)+'</div><div class="pb"><h3>'+esc(p.t)+'</h3><p>'+esc(p.d)+'</p><div class="chips" style="margin:0">'+(p.s||[]).map(function(s){return '<span class="tag">'+esc(s)+'</span>'}).join('')+'</div>'+btn+'</div></article>'}).join(''):'<p style="color:var(--mut)">Belum ada proyek di kategori ini.</p>'}
+    return '<article class="pc" role="button" tabindex="0" data-i="'+x[1]+'" aria-label="Lihat detail '+esc(p.t)+'"><div class="cv" style="'+grad(n)+'">'+cvi(p,true)+'</div><div class="pb"><h3>'+esc(p.t)+'</h3><div class="chips" style="margin:0">'+(p.s||[]).map(function(s){return '<span class="tag">'+esc(s)+'</span>'}).join('')+'</div>'+btn+'</div></article>'}).join(''):'<p style="color:var(--mut)">Belum ada proyek di kategori ini.</p>'}
+function openP(i){var p=D.projects[i];if(!p)return;
+  $("#pcv").setAttribute("style",grad(i));$("#pcv").innerHTML=cvi(p,true);
+  $("#pcat").textContent=p.c||'';$("#pcat").style.display=p.c?'':'none';
+  $("#pt").textContent=p.t;
+  $("#pd").textContent=p.d||'';$("#pd").style.display=p.d?'':'none';
+  $("#ps").innerHTML=(p.s||[]).map(function(s){return '<span class="tag">'+esc(s)+'</span>'}).join('');
+  var d=safe(p.demo),g=safe(p.gh),b='';
+  if(d)b+='<a class="btn pri" href="'+esc(d)+'" target="_blank" rel="noopener">Live Demo</a>';
+  if(g)b+='<a class="btn" href="'+esc(g)+'" target="_blank" rel="noopener">GitHub</a>';
+  $("#pbtn").innerHTML=b;$("#pbtn").style.display=b?'':'none';
+  pm.classList.add("open");$("#px").focus()}
 function applySite(c){
   var S=c.site,main=document.querySelector("main"),byId={},nav=['<a href="#home" class="on">Home</a>'],foot=[];
   document.querySelectorAll("main > section").forEach(function(el){byId[el.id]=el});
@@ -251,8 +264,13 @@ function render(c){
 $("#tabs").onclick=function(e){if(!e.target.classList.contains("tab"))return;cur=e.target.textContent;[].forEach.call(this.children,function(b){b.classList.toggle("on",b===e.target)});showP()};
 var md=$("#modal");
 $("#cg").onclick=function(e){var b=e.target.closest(".cc");if(!b)return;var c=D.certificates[b.dataset.i];if(!c)return;$("#mcv").setAttribute("style",grad(+b.dataset.i));$("#mcv").innerHTML=cvi(c);$("#mt").textContent=c.t;$("#mi").textContent=c.i;md.classList.add("open")};
-function closeM(){md.classList.remove("open")}
-$("#mx").onclick=closeM;md.onclick=function(e){if(e.target===md)closeM()};document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});
+var pm=$("#pmodal");
+function closeM(){md.classList.remove("open");pm.classList.remove("open")}
+$("#mx").onclick=closeM;$("#px").onclick=closeM;
+md.onclick=function(e){if(e.target===md)closeM()};pm.onclick=function(e){if(e.target===pm)closeM()};
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});
+$("#pg").addEventListener("click",function(e){if(e.target.closest("a"))return;var c=e.target.closest(".pc");if(c)openP(+c.dataset.i)});
+$("#pg").addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("pc")){e.preventDefault();openP(+e.target.dataset.i)}});
 
 // ---------- form kontak ----------
 $("#cf").onsubmit=function(e){e.preventDefault();var f=new FormData(this),m=$("#fm"),fr=this,EP=window.FORM_ENDPOINT,mail=D.profile.email;
