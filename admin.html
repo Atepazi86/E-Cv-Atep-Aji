@@ -13,6 +13,7 @@ body{background:var(--bg);color:var(--fg);font:400 15px/1.55 system-ui,-apple-sy
 button,input,select,textarea{font:inherit;color:inherit}
 .hide{display:none!important}
 .btn{padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);cursor:pointer;font-weight:600;font-size:14px}
+a.btn{text-decoration:none;color:inherit;display:inline-block}
 .btn:hover{border-color:var(--a1)}
 .btn.pri{background:var(--a1);color:#fff;border-color:var(--a1)}
 .btn.bad{color:var(--bad)}
@@ -47,6 +48,8 @@ label,.fld{display:grid;gap:5px;font-size:13px;color:var(--mut)}
 .img .pv{width:96px;height:72px;border-radius:10px;border:1px solid var(--line);background:var(--bg) center/cover no-repeat;display:grid;place-items:center;color:var(--mut);font-size:12px;overflow:hidden}
 .img .pv img{width:100%;height:100%;object-fit:cover}
 .hint{font-size:12px;color:var(--mut)}
+.chk{display:flex;gap:8px;align-items:center;color:var(--fg);font-size:14px;cursor:pointer}
+.chk input{width:auto;margin:0}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:560px){.row2{grid-template-columns:1fr}}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;z-index:99;opacity:0;pointer-events:none;transition:opacity .25s;max-width:90vw}
@@ -100,7 +103,6 @@ var db=window.getDB&&window.getDB();
 if(!db){var why=!window.supabase?"Skrip Supabase gagal dimuat dari internet. Cek koneksi atau coba jaringan lain, lalu muat ulang.":(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY?"config.js di situs ini masih kosong. Pastikan deploy terbaru di Vercel sudah selesai, lalu tekan Ctrl+F5.":"Konfigurasi tidak valid.");$("#lf").innerHTML='<h1>Belum bisa terhubung</h1><p>'+why+'</p>';return}
 
 // ---------- skema form ----------
-var CATS=["Web","Jaringan","Kreatif","Organisasi"];
 var PROFILE=[
  ["Beranda",null],
  ["name","Nama lengkap","text"],["role","Peran / jabatan","text"],["tag","Label kecil di atas nama","text"],["status","Teks status ketersediaan","text"],
@@ -117,15 +119,23 @@ var LISTS={
  skills:{add:"Tambah keahlian",title:function(x){return x.n+" ("+x.v+"%)"},blank:{n:"",v:50},f:[["n","Nama keahlian","text"],["v","Level (0–100)","number"]]},
  techs:{add:"Tambah kelompok",title:function(x){return x.g},blank:{g:"",items:[]},f:[["g","Nama kelompok (mis. Frontend)","text"],["items","Daftar teknologi (pisahkan dengan koma)","csv"]]},
  projects:{add:"Tambah proyek",title:function(x){return x.t},blank:{c:"Web",t:"Proyek baru",d:"",s:[],e:"💻",img:"",demo:"",gh:""},
-  f:[["t","Judul","text"],["c","Kategori","select"],["d","Deskripsi","textarea"],["s","Teknologi (pisahkan dengan koma)","csv"],["img","Gambar sampul","image"],["e","Emoji sampul (dipakai bila tanpa gambar)","text"],["demo","Link Live Demo (https://…)","text"],["gh","Link GitHub (https://…)","text"]]},
+  f:[["t","Judul","text"],["c","Kategori","select"],["d","Deskripsi","textarea"],["s","Teknologi (pisahkan dengan koma)","csv"],["img","Gambar sampul","image"],["e","Emoji sampul (dipakai bila tanpa gambar)","text"],["demo","Link Live Demo (https://…)","text"],["gh","Link GitHub (https://…)","text"],["hide","Sembunyikan dari situs (tidak dihapus)","bool"]]},
  experience:{add:"Tambah pengalaman",title:function(x){return x.title},blank:{time:"",title:"Pengalaman baru",sub:"",points:[],result:""},
-  f:[["time","Tahun / periode","text"],["title","Judul peran","text"],["sub","Organisasi / tempat","text"],["points","Poin kegiatan (satu per baris)","lines"],["result","Label hasil (opsional)","text"]]},
+  f:[["time","Tahun / periode","text"],["title","Judul peran","text"],["sub","Organisasi / tempat","text"],["points","Poin kegiatan (satu per baris)","lines"],["result","Label hasil (opsional)","text"],["hide","Sembunyikan dari situs (tidak dihapus)","bool"]]},
  education:{add:"Tambah pendidikan",title:function(x){return x.title},blank:{time:"",title:"Pendidikan baru",sub:"",points:[],result:""},
-  f:[["time","Tahun / periode","text"],["title","Nama sekolah / kampus","text"],["sub","Jurusan / keterangan","text"],["points","Poin (satu per baris)","lines"],["result","Label (mis. IPK)","text"]]},
+  f:[["time","Tahun / periode","text"],["title","Nama sekolah / kampus","text"],["sub","Jurusan / keterangan","text"],["points","Poin (satu per baris)","lines"],["result","Label (mis. IPK)","text"],["hide","Sembunyikan dari situs (tidak dihapus)","bool"]]},
  certificates:{add:"Tambah sertifikat",title:function(x){return x.t},blank:{t:"Sertifikat baru",i:"Penerbit, tahun",e:"🏅",img:""},
-  f:[["t","Nama sertifikat","text"],["i","Penerbit dan tahun","text"],["img","Gambar sertifikat","image"],["e","Emoji sampul (dipakai bila tanpa gambar)","text"]]}
+  f:[["t","Nama sertifikat","text"],["i","Penerbit dan tahun","text"],["img","Gambar sertifikat","image"],["e","Emoji sampul (dipakai bila tanpa gambar)","text"],["hide","Sembunyikan dari situs (tidak dihapus)","bool"]]},
+
+ categories:{add:"Tambah kategori",title:function(x){return x.n||""},blank:{n:"Kategori baru"},f:[["n","Nama kategori","text"]],
+  note:"Kategori menjadi tombol filter di bagian Proyek (mis. tambah “Game”, hapus “Jaringan”). Mengganti nama otomatis ikut mengubah proyek yang memakainya. Menghapus kategori TIDAK menghapus proyek: proyeknya tetap tampil di “Semua”. Pilih kategori tiap proyek di tab Proyek."},
+ process:{add:"Tambah langkah",title:function(x){return (x.ic||"")+" "+(x.t||"")},blank:{ic:"✨",t:"Langkah baru",d:""},f:[["ic","Ikon (emoji)","text"],["t","Judul","text"],["d","Deskripsi","textarea"]],
+  note:"Kartu di bagian “How I Work”. Hapus semuanya untuk menyembunyikan bagian itu."},
+ sections:{fixed:true,title:function(x){return (x.show?"":"🚫 ")+(x.label||x.id)+" — "+(x.title||"")},f:[["show","Tampilkan bagian ini di situs","bool"],["nav","Tampilkan di menu atas","bool"],["label","Nama di menu","text"],["title","Judul bagian","text"],["sub","Teks di bawah judul (kosongkan untuk menyembunyikan)","textarea"]],
+  note:"Atur urutan bagian dengan ▲ ▼, sembunyikan bagian yang tidak dipakai, dan ubah judulnya. Bagian Beranda selalu paling atas."}
 };
-var TABS=[["profile","Profil & Tentang"],["skills","Keahlian"],["techs","Teknologi"],["projects","Proyek"],["experience","Pengalaman"],["education","Pendidikan"],["certificates","Sertifikat"]];
+function listOf(sec){return sec==="sections"?data.site.sections:data[sec]}
+var TABS=[["profile","Profil & Tentang"],["skills","Keahlian"],["techs","Teknologi"],["projects","Proyek"],["categories","Kategori proyek"],["process","Cara kerja"],["experience","Pengalaman"],["education","Pendidikan"],["certificates","Sertifikat"],["sections","Bagian situs"],["look","Tampilan"]];
 
 // ---------- state ----------
 var data=null,tab="profile",dirty=false,opened={};
@@ -146,11 +156,13 @@ function fromStr(type,s){
  return s}
 function field(sec,i,f,obj){
  var k=f[0],lab=f[1],type=f[2],v=obj[k],at=' data-s="'+sec+'" data-i="'+i+'" data-k="'+k+'" data-t="'+type+'"';
+ if(type==="bool")return '<label class="chk"><input type="checkbox"'+at+(v?' checked':'')+'> '+esc(lab)+'</label>';
+ if(type==="color"){var dv=k==="a1"?"#6d4aff":"#0ea5e9";return '<div class="fld">'+esc(lab)+'<span class="img"><input type="color"'+at+' value="'+esc(v||dv)+'" style="width:56px;height:40px;padding:2px"><span class="hint">'+(v?esc(v):"warna bawaan")+'</span>'+(v?'<button class="btn sm" type="button" data-act="clr"'+at+'>Pakai warna bawaan</button>':'')+'</span></div>'}
  if(type==="image"){
   var u=v||"";
   return '<div class="fld">'+esc(lab)+'<span class="img"><span class="pv">'+(u?'<img src="'+esc(u)+'" alt="" onerror="this.remove()">':'Kosong')+'</span><span class="acts"><label class="btn sm" style="display:inline-block;cursor:pointer">Pilih gambar…<input type="file" accept="image/*" hidden'+at+' data-up="1"></label>'+(u?'<button class="btn sm bad" type="button" data-act="clr"'+at+'>Hapus</button>':'')+'</span></span></div>'}
  if(type==="textarea"||type==="lines"||type==="paras")return '<label>'+esc(lab)+'<textarea'+at+' rows="'+(type==="paras"?7:3)+'">'+esc(toStr(type,v))+'</textarea></label>';
- if(type==="select")return '<label>'+esc(lab)+'<select'+at+'>'+CATS.map(function(o){return '<option'+(o===v?' selected':'')+'>'+o+'</option>'}).join("")+'</select></label>';
+ if(type==="select"){var opts=(data.categories||[]).map(function(x){return x.n}).filter(Boolean);if(v&&opts.indexOf(v)<0)opts.push(v);return '<label>'+esc(lab)+'<select'+at+'>'+opts.map(function(o){return '<option value="'+esc(o)+'"'+(o===v?' selected':'')+'>'+esc(o)+'</option>'}).join("")+'</select></label>'}
  return '<label>'+esc(lab)+'<input'+(type==="number"?' type="number" min="0" max="100"':'')+at+' value="'+esc(toStr(type,v))+'"></label>'}
 
 // ---------- tampilan ----------
@@ -158,42 +170,48 @@ function draw(){
  $("#tabs").innerHTML=TABS.map(function(t){return '<button class="tab'+(t[0]===tab?' on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>'}).join("");
  var h="";
  if(tab==="profile"){
-  var grp="",open=false;
+  var open=false;
   PROFILE.forEach(function(f){
    if(f[1]===null){if(open)h+='</div>';h+='<div class="flat"><b>'+esc(f[0])+'</b>';open=true}
    else h+=field("profile","",f,data.profile)});
   if(open)h+='</div>';
+ }else if(tab==="look"){
+  h='<div class="flat"><b>Warna situs</b><p class="hint">Pilih warna aksen (tombol, garis, gradasi). Berlaku di mode terang dan gelap. “Pakai warna bawaan” mengembalikan ungu–biru asli.</p>'+field("colors","",["a1","Warna utama","color"],data.site.colors)+field("colors","",["a2","Warna sekunder","color"],data.site.colors)+'</div>'+
+   '<div class="flat"><b>Sampul proyek</b>'+field("site","",["autoShot","Bila gambar proyek kosong, tampilkan tangkapan layar otomatis dari link Live Demo","bool"],data.site)+'<p class="hint">Tangkapan layar dibuat layanan pihak ketiga (WordPress mshots), jadi saat pertama kali muncul bisa butuh beberapa detik. Gambar yang Anda unggah sendiri selalu diprioritaskan.</p></div>';
  }else{
-  var L=LISTS[tab],arr=data[tab];
-  h=arr.map(function(x,i){
+  var L=LISTS[tab],arr=listOf(tab);
+  h=(L.note?'<p class="hint">'+esc(L.note)+'</p>':'')+arr.map(function(x,i){
    var key=tab+":"+i;
    return '<details class="card" data-key="'+key+'"'+(opened[key]?' open':'')+'><summary><span>'+esc(L.title(x)||"(tanpa judul)")+'</span></summary><div class="body">'+L.f.map(function(f){return field(tab,i,f,x)}).join("")+
-   '<div class="acts"><button class="btn sm" data-act="up" data-s="'+tab+'" data-i="'+i+'">▲ Naik</button><button class="btn sm" data-act="down" data-s="'+tab+'" data-i="'+i+'">▼ Turun</button><button class="btn sm bad" data-act="del" data-s="'+tab+'" data-i="'+i+'">Hapus</button></div></div></details>'}).join("");
-  h+='<button class="btn pri" data-act="add" data-s="'+tab+'">+ '+L.add+'</button>';
-  if(!arr.length)h='<p class="hint">Belum ada item. Bagian ini akan disembunyikan dari situs bila kosong.</p>'+h;
+   '<div class="acts"><button class="btn sm" data-act="up" data-s="'+tab+'" data-i="'+i+'">▲ Naik</button><button class="btn sm" data-act="down" data-s="'+tab+'" data-i="'+i+'">▼ Turun</button>'+(L.fixed?'':'<button class="btn sm bad" data-act="del" data-s="'+tab+'" data-i="'+i+'">Hapus</button>')+'</div></div></details>'}).join("");
+  if(!L.fixed)h+='<button class="btn pri" data-act="add" data-s="'+tab+'">+ '+L.add+'</button>';
+  if(!arr.length&&!L.fixed)h='<p class="hint">Belum ada item. Bagian ini akan disembunyikan dari situs bila kosong.</p>'+h;
  }
  $("#panel").innerHTML=h}
 
-function target(e){var s=e.dataset.s,i=e.dataset.i;return s==="profile"?data.profile:data[s][+i]}
+function target(e){var s=e.dataset.s,i=e.dataset.i;if(s==="profile")return data.profile;if(s==="site")return data.site;if(s==="colors")return data.site.colors;return listOf(s)[+i]}
 
 // ---------- event ----------
 $("#tabs").onclick=function(e){var b=e.target.closest("[data-tab]");if(b){tab=b.dataset.tab;draw()}};
 $("#panel").addEventListener("input",function(e){
  var el=e.target;if(!el.dataset.k||el.dataset.up)return;
- target(el)[el.dataset.k]=fromStr(el.dataset.t,el.value);setDirty(true);
- if(el.dataset.s!=="profile"){var L=LISTS[el.dataset.s],c=el.closest(".card");if(c){var x=data[el.dataset.s][+el.dataset.i];c.querySelector("summary span").textContent=L.title(x)||"(tanpa judul)"}}});
+ var o=target(el),v=el.type==="checkbox"?el.checked:fromStr(el.dataset.t,el.value);
+ if(el.dataset.s==="categories"&&el.dataset.k==="n"){var old=o.n;data.projects.forEach(function(p){if(p.c===old)p.c=v})}
+ o[el.dataset.k]=v;setDirty(true);
+ var L=LISTS[el.dataset.s],c=el.closest(".card");if(L&&c)c.querySelector("summary span").textContent=L.title(o)||"(tanpa judul)"});
 $("#panel").addEventListener("toggle",function(e){var d=e.target;if(d.dataset&&d.dataset.key)opened[d.dataset.key]=d.open},true);
 $("#panel").addEventListener("click",function(e){
- var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act,s=b.dataset.s,i=+b.dataset.i;
- if(a==="add"){data[s].push(JSON.parse(JSON.stringify(LISTS[s].blank)));opened[s+":"+(data[s].length-1)]=true}
- else if(a==="del"){if(!confirm("Hapus item ini?"))return;data[s].splice(i,1);opened={}}
- else if(a==="up"&&i>0){var t=data[s][i];data[s][i]=data[s][i-1];data[s][i-1]=t;opened={};opened[s+":"+(i-1)]=true}
- else if(a==="down"&&i<data[s].length-1){var t2=data[s][i];data[s][i]=data[s][i+1];data[s][i+1]=t2;opened={};opened[s+":"+(i+1)]=true}
+ var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act,s=b.dataset.s,i=+b.dataset.i,A;
+ if(a==="add"){A=listOf(s);A.push(JSON.parse(JSON.stringify(LISTS[s].blank)));opened[s+":"+(A.length-1)]=true}
+ else if(a==="del"){A=listOf(s);if(!confirm(s==="categories"?"Hapus kategori ini? Proyeknya tidak ikut terhapus dan tetap tampil di “Semua”.":"Hapus item ini?"))return;A.splice(i,1);opened={}}
+ else if(a==="up"){A=listOf(s);if(i<=0)return;var t=A[i];A[i]=A[i-1];A[i-1]=t;opened={};opened[s+":"+(i-1)]=true}
+ else if(a==="down"){A=listOf(s);if(i>=A.length-1)return;var t2=A[i];A[i]=A[i+1];A[i+1]=t2;opened={};opened[s+":"+(i+1)]=true}
  else if(a==="clr"){target(b)[b.dataset.k]=""}
  else return;
  setDirty(true);draw()});
 $("#panel").addEventListener("change",function(e){
- var el=e.target;if(!el.dataset.up||!el.files[0])return;
+ var el=e.target;if(el.type==="color"){draw();return}
+ if(!el.dataset.up||!el.files[0])return;
  var f=el.files[0],obj=target(el),k=el.dataset.k;
  if(f.size>15*1024*1024){toast("Gambar terlalu besar (maks 15 MB).",1);return}
  toast("Mengunggah gambar…");
@@ -224,7 +242,7 @@ function clean(v){
  return typeof v==="string"?v.trim():v}
 $("#save").onclick=function(){
  var b=this;b.disabled=true;b.textContent="Menyimpan…";
- var out=clean(data);
+ var out=clean(data);out.categories=(out.categories||[]).filter(function(x){return x.n});
  db.from("site_content").upsert({id:1,data:out,updated_at:new Date().toISOString()}).then(function(r){
   if(r.error)throw r.error;data=window.mergeContent(out);setDirty(false);draw();
   try{localStorage.setItem("pf-cache",JSON.stringify(out))}catch(e){}

@@ -58,7 +58,30 @@ window.DEFAULTS = {
     { t: "Sertifikat pelatihan Laravel", i: "Penerbit, tahun", e: "🏅", img: "" },
     { t: "Sertifikat jaringan komputer", i: "Penerbit, tahun", e: "🎖️", img: "" },
     { t: "Sertifikat kepanitiaan", i: "Penerbit, tahun", e: "📜", img: "" }
-  ]
+  ],
+  categories: [{ n: "Web" }, { n: "Jaringan" }, { n: "Kreatif" }, { n: "Organisasi" }],
+  process: [
+    { ic: "🔎", t: "Research", d: "Menggali kebutuhan, konteks, dan tujuan agar solusi yang dibuat tepat sasaran." },
+    { ic: "🧩", t: "Plan", d: "Menyusun alur kerja, prioritas, dan struktur fitur agar proses lebih efisien." },
+    { ic: "💻", t: "Build", d: "Mengembangkan produk dengan fokus pada performa, tampilan, dan kemudahan penggunaan." },
+    { ic: "🚀", t: "Launch", d: "Melakukan evaluasi akhir dan memastikan hasil siap dipakai dengan kualitas terukur." }
+  ],
+  site: {
+    colors: { a1: "", a2: "" },
+    autoShot: true,
+    sections: [
+      { id: "about", label: "About", title: "Tentang saya", sub: "", show: true, nav: true },
+      { id: "process", label: "How I Work", title: "How I Work", sub: "Cara saya menyelesaikan pekerjaan: terstruktur, cepat, dan tetap fokus pada hasil yang nyata.", show: true, nav: false },
+      { id: "skills", label: "Skills", title: "Keahlian", sub: "Yang sudah saya pakai dalam kuliah, organisasi, dan kerja lapangan.", show: true, nav: true },
+      { id: "impact", label: "Impact", title: "Impact & Achievement", sub: "Beberapa pencapaian dan nilai yang saya bawa dari proses belajar, organisasi, dan pengalaman nyata.", show: true, nav: true },
+      { id: "projects", label: "Projects", title: "Proyek", sub: "Pekerjaan yang pernah saya tangani. Tombol demo dan GitHub aktif begitu linknya tersedia.", show: true, nav: true },
+      { id: "experience", label: "Experience", title: "Pengalaman", sub: "Peran yang pernah saya jalankan, dari lapangan sampai kepengurusan.", show: true, nav: true },
+      { id: "education", label: "Education", title: "Pendidikan", sub: "", show: true, nav: false },
+      { id: "certificates", label: "Certificates", title: "Sertifikat", sub: "Klik kartu untuk melihat pratinjau lebih besar.", show: true, nav: true },
+      { id: "cta", label: "Ajakan", title: "Siap bekerja sama atau magang bersama saya?", sub: "Saya terbuka untuk proyek, kolaborasi, atau kesempatan magang di bidang web development, sistem informasi, dan jaringan.", show: true, nav: false },
+      { id: "contact", label: "Contact", title: "Punya peluang magang atau proyek?", sub: "Kirim pesan singkat berisi kebutuhan Anda. Saya balas secepatnya.", show: true, nav: true }
+    ]
+  }
 };
 
 // Gabungkan data tersimpan dengan data bawaan (bagian yang kosong memakai bawaan).
@@ -67,6 +90,18 @@ window.mergeContent = function (d) {
   if (d && typeof d === "object") {
     Object.keys(d).forEach(function (k) {
       if (k === "profile") o.profile = Object.assign({}, o.profile, d.profile);
+      else if (k === "site" && d.site && typeof d.site === "object") {
+        var st = d.site;
+        o.site.colors = Object.assign({}, o.site.colors, st.colors);
+        if (typeof st.autoShot === "boolean") o.site.autoShot = st.autoShot;
+        if (Array.isArray(st.sections)) {
+          var def = {}, out = [];
+          o.site.sections.forEach(function (x) { def[x.id] = x; });
+          st.sections.forEach(function (x) { if (x && def[x.id]) { out.push(Object.assign({}, def[x.id], x)); delete def[x.id]; } });
+          o.site.sections.forEach(function (x) { if (def[x.id]) out.push(x); });
+          o.site.sections = out;
+        }
+      }
       else if (Array.isArray(d[k])) o[k] = d[k];
     });
   }
