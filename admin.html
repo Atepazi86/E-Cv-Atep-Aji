@@ -88,7 +88,7 @@ label,.fld{display:grid;gap:5px;font-size:13px;color:var(--mut)}
 <div id="toast" role="status"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+<script src="config.js?v=2"></script>
 <script src="content.js"></script>
 <script>
 (function(){
@@ -97,7 +97,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function toast(m,bad){var t=$("#toast");t.textContent=m;t.className="on"+(bad?" bad":"");clearTimeout(toast.t);toast.t=setTimeout(function(){t.className=""},3200)}
 
 var db=window.getDB&&window.getDB();
-if(!db){$("#lf").innerHTML='<h1>Belum dikonfigurasi</h1><p>Isi <b>SUPABASE_URL</b> dan <b>SUPABASE_ANON_KEY</b> di file <b>config.js</b>, lalu muat ulang halaman ini. Langkahnya ada di PANDUAN.md.</p>';return}
+if(!db){var why=!window.supabase?"Skrip Supabase gagal dimuat dari internet. Cek koneksi atau coba jaringan lain, lalu muat ulang.":(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY?"config.js di situs ini masih kosong. Pastikan deploy terbaru di Vercel sudah selesai, lalu tekan Ctrl+F5.":"Konfigurasi tidak valid.");$("#lf").innerHTML='<h1>Belum bisa terhubung</h1><p>'+why+'</p>';return}
 
 // ---------- skema form ----------
 var CATS=["Web","Jaringan","Kreatif","Organisasi"];
