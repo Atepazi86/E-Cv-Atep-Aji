@@ -6,7 +6,7 @@
 -- Aturan keamanan:
 --   * Semua orang boleh MEMBACA konten (agar situs publik tampil).
 --   * Hanya akun dengan email di bawah yang boleh MENGUBAH konten dan gambar.
--- Jika email admin Anda berbeda, ganti 'atepazi2004@gmail.com' (huruf kecil semua)
+-- Jika email admin Anda berbeda, ganti 'atepazi86@gmail.com' (huruf kecil semua)
 -- di semua tempat sebelum menjalankan.
 -- ============================================================
 
@@ -28,12 +28,12 @@ create policy "publik boleh baca" on public.site_content
 
 create policy "pemilik boleh tambah" on public.site_content
   for insert to authenticated
-  with check (lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com');
+  with check (lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com');
 
 create policy "pemilik boleh ubah" on public.site_content
   for update to authenticated
-  using (lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com')
-  with check (lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com');
+  using (lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com')
+  with check (lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com');
 
 -- 2. Penyimpanan gambar (foto profil, sampul proyek, sertifikat)
 insert into storage.buckets (id, name, public)
@@ -50,12 +50,12 @@ create policy "media publik baca" on storage.objects
 
 create policy "media pemilik unggah" on storage.objects
   for insert to authenticated
-  with check (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com');
+  with check (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com');
 
 create policy "media pemilik ubah" on storage.objects
   for update to authenticated
-  using (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com');
+  using (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com');
 
 create policy "media pemilik hapus" on storage.objects
   for delete to authenticated
-  using (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi2004@gmail.com');
+  using (bucket_id = 'media' and lower(auth.jwt() ->> 'email') = 'atepazi86@gmail.com');
