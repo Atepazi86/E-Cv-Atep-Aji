@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://e-cv-atep-aji.vercel.app/sitemap.xml
